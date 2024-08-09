@@ -34,7 +34,7 @@ local function logics()
     local current_time = get_time_since_inject();
     next_time_allowed_cast = current_time + 0.2;
 
-    console.print("Druid Plugin, Casted Blood Howls");
+    console.print("Druid Plugin, Casted Cataclysm");
         return true;
     end;
     
