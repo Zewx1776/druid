@@ -1,63 +1,76 @@
 local my_utility = require("my_utility/my_utility")
+local my_target_selector = require("my_utility/my_target_selector")
 
 local petrify_menu_elements =
 {
-    main_tab           = tree_node:new(1),
+    tree_tab           = tree_node:new(1),
     main_boolean       = checkbox:new(true, get_hash(my_utility.plugin_label .. "disable_enable_ability")),
     min_max_targets    = slider_int:new(0, 30, 5, get_hash(my_utility.plugin_label .. "min_max_number_of_targets_for_cast"))
 }
 
 local function menu()
-
-    if petrify_menu_elements.main_tab:push("Petrify") then
+    if petrify_menu_elements.tree_tab:push("Petrify") then
         petrify_menu_elements.main_boolean:render("Enable Spell", "")
  
-         if petrify_menu_elements.main_boolean:get() then
-            petrify_menu_elements.min_max_targets:render("Min hits", "Amount of targets to cast the spell")
-         end
+        if petrify_menu_elements.main_boolean:get() then
+            petrify_menu_elements.min_max_targets:render("Min hits", "Amount of targets to cast the spell", 0)
+        end
 
-         petrify_menu_elements.main_tab:pop()
+        petrify_menu_elements.tree_tab:pop()
     end
 end
 
-local local_player = get_local_player();
-if local_player == nil then
-    return
-end
-local next_time_allowed_cast = 0.0;
-local spell_id_petrify = 351722;
+local spell_id_petrify = 351722
+local next_time_allowed_cast = 0.0
+
 local function logics()
-    
-    local menu_boolean = petrify_menu_elements.main_boolean:get();
+    local menu_boolean = petrify_menu_elements.main_boolean:get()
     local is_logic_allowed = my_utility.is_spell_allowed(
                 menu_boolean, 
                 next_time_allowed_cast, 
-                spell_id_petrify);
+                spell_id_petrify)
 
     if not is_logic_allowed then
-        return false;
-    end;
+        return false
+    end
 
-    local area_data = target_selector.get_most_hits_target_circular_area_light(get_player_position(), 8, 8, false)
-    local units = area_data.n_hits
+    -- Get the list of monsters in the area
+    local player_position = get_player_position()
+    local range = 8
+    local collision_table = {is_enabled = false}
+    local floor_table = {is_enabled = false}
+    local angle_table = {is_enabled = false}
+    local target_list = my_target_selector.get_target_list(player_position, range, collision_table, floor_table, angle_table)
 
-    if units < petrify_menu_elements.min_max_targets:get() then
-        return false;
-    end;
+    -- Calculate weighted units
+    local weighted_units = 0
+    for _, unit in ipairs(target_list) do
+        if unit:is_elite() or unit:is_boss() or unit:is_champion() then
+            weighted_units = weighted_units + 10
+        else
+            weighted_units = weighted_units + 1
+        end
+    end
 
-    if cast_spell.self(spell_id_petrify, 0.0) then
-    local current_time = get_time_since_inject();
-    next_time_allowed_cast = current_time + 0.2;
-    console.print("Druid Plugin, Petrify");
-        return true;
-    end;
-        
-    return false;
+    -- Print the weighted score
+    console.print("Weighted Units: " .. weighted_units)
+
+    if weighted_units < petrify_menu_elements.min_max_targets:get() then
+        return false
+    end
+
+    if cast_spell.self(spell_id_petrify, 0.2) then
+        local current_time = get_time_since_inject()
+        next_time_allowed_cast = current_time + 0.001
+        console.print("Druid Plugin, Petrify")
+        return true
+    end
+    
+    return false
 end
 
 return
 {
     menu = menu,
-    logics = logics,
+    logics = logics,   
 }
-
