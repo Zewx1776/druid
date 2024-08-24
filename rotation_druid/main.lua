@@ -39,7 +39,7 @@ local spells =
     lacerate            = require("spells/lacerate"),
 }
 
-on_render_menu (function ()
+on_render_menu(function ()
 
     if not menu.main_tree:push("Druid: Base") then
         return;
@@ -51,7 +51,7 @@ on_render_menu (function ()
       -- plugin not enabled, stop rendering menu elements
       menu.main_tree:pop();
       return;
-   end;
+    end;
  
     spells.earth_spike.menu();
     spells.tornado.menu();
@@ -79,8 +79,7 @@ on_render_menu (function ()
     spells.lacerate.menu();
     menu.main_tree:pop();
 
-end
-)
+end)
 
 local can_move = 0.0;
 local cast_end_time = 0.0;
@@ -195,6 +194,16 @@ on_update(function ()
         end
     end
 
+    -- Check if Petrify should be cast first
+    if spells.petrify and spells.petrify.should_cast_petrify then
+        if spells.petrify.should_cast_petrify() then
+            if spells.petrify.logics() then
+                cast_end_time = current_time + 0.2;
+                return;
+            end
+        end
+    end
+
     if spells.claw.logics(best_target)then
         cast_end_time = current_time + 0.4;
         return;
@@ -260,11 +269,6 @@ on_update(function ()
         return;
     end;
 
-    if spells.landslide.logics(best_target)then
-        cast_end_time = current_time + 0.4;
-        return;
-    end;
-
     if spells.lightningstorm.logics(best_target)then
         cast_end_time = current_time + 0.4;
         return;
@@ -315,12 +319,16 @@ on_update(function ()
         return;
     end;
 
+    if spells.landslide.logics(best_target)then
+        cast_end_time = current_time + 0.1;
+        return;
+    end;
+
     -- auto play engage far away monsters
     local move_timer = get_time_since_inject()
     if move_timer < can_move then
         return;
     end;
-
 
     local is_auto_play = my_utility.is_auto_play_enabled();
     if is_auto_play then
@@ -329,23 +337,11 @@ on_update(function ()
         if not is_dangerous_evade_position then
             local closer_target = target_selector.get_target_closer(player_position, 15.0);
             if closer_target then
-                -- if is_blood_mist then
-                --     local closer_target_position = closer_target:get_position();
-                --     local move_pos = closer_target_position:get_extended(player_position, -5.0);
-                --     if pathfinder.move_to_cpathfinder(move_pos) then
-                --         cast_end_time = current_time + 0.40;
-                --         can_move = move_timer + 1.50;
-                --         --console.print("auto play move_to_cpathfinder - 111")
-                --     end
-                -- else
-                    local closer_target_position = closer_target:get_position();
-                    local move_pos = closer_target_position:get_extended(player_position, 4.0);
-                    if pathfinder.move_to_cpathfinder(move_pos) then
-                        can_move = move_timer + 1.50;
-                        --console.print("auto play move_to_cpathfinder - 222")
-                    end
-                -- end
-                
+                local closer_target_position = closer_target:get_position();
+                local move_pos = closer_target_position:get_extended(player_position, 4.0);
+                if pathfinder.move_to_cpathfinder(move_pos) then
+                    can_move = move_timer + 1.50;
+                end
             end
         end
     end
@@ -384,17 +380,12 @@ on_render(function ()
         local position = obj:get_position();
         local distance_sqr = position:squared_dist_to_ignore_z(player_position);
         local is_close = distance_sqr < (8.0 * 8.0);
-            -- if is_close then
-                graphics.circle_3d(position, 1, color_white(100));
+            graphics.circle_3d(position, 1, color_white(100));
 
-                local future_position = prediction.get_future_unit_position(obj, 0.4);
-                graphics.circle_3d(future_position, 0.5, color_yellow(100));
-            -- end;
+            local future_position = prediction.get_future_unit_position(obj, 0.4);
+            graphics.circle_3d(future_position, 0.5, color_yellow(100));
         end;
     end
-
-
-    -- glow target -- quick pasted code cba about this game
 
     local screen_range = 16.0;
     local player_position = get_player_position();
@@ -423,8 +414,6 @@ on_render(function ()
     if is_auto_play_active then
         max_range = 12.0;
     end
-
-    -- console.print(max_range)
 
     local best_target = target_selector_data.closest_unit;
 
@@ -465,7 +454,6 @@ on_render(function ()
         graphics.line(glow_target_position_2d, player_screen_position, color_red(180), 2.5)
         graphics.circle_3d(glow_target_position, 0.80, color_red(200), 2.0);
     end
-
 
 end);
 

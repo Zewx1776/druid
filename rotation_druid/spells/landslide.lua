@@ -31,7 +31,7 @@ local function logics(target)
 
     local target_position = target:get_position();
 
-    cast_spell.position(spell_id_land, target_position, 0.35) 
+    cast_spell.position(spell_id_land, target_position, 0.01) 
     local current_time = get_time_since_inject();
     next_time_allowed_cast = current_time + 0.01;
         
