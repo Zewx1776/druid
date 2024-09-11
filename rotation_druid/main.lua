@@ -81,7 +81,6 @@ on_render_menu(function ()
 
 end)
 
-local can_move = 0.0;
 local cast_end_time = 0.0;
 
 local claw_buff_name = "legendary_druid_100"
@@ -320,31 +319,10 @@ on_update(function ()
     end;
 
     if spells.landslide.logics(best_target)then
-        cast_end_time = current_time + 0.1;
+        cast_end_time = current_time + 0.01;
         return;
     end;
 
-    -- auto play engage far away monsters
-    local move_timer = get_time_since_inject()
-    if move_timer < can_move then
-        return;
-    end;
-
-    local is_auto_play = my_utility.is_auto_play_enabled();
-    if is_auto_play then
-        local player_position = local_player:get_position();
-        local is_dangerous_evade_position = evade.is_dangerous_position(player_position);
-        if not is_dangerous_evade_position then
-            local closer_target = target_selector.get_target_closer(player_position, 15.0);
-            if closer_target then
-                local closer_target_position = closer_target:get_position();
-                local move_pos = closer_target_position:get_extended(player_position, 4.0);
-                if pathfinder.move_to_cpathfinder(move_pos) then
-                    can_move = move_timer + 1.50;
-                end
-            end
-        end
-    end
 
 end)
 

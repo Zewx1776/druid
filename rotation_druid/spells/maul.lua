@@ -28,7 +28,7 @@ end
 local spell_id_maul = 309070
 local maul_data = spell_data:new(
     1.0,                             -- radius
-    0.5,                            -- range
+    3.5,                            -- range
     0.2,                            -- cast_delay
     0.2,                            -- projectile_speed
     true,                          -- has_collision
@@ -36,7 +36,7 @@ local maul_data = spell_data:new(
     spell_geometry.rectangular,        -- geometry_type
     targeting_type.targeted        --targeting_type
 )
-local next_time_allowed_cast = 0.0;
+local next_time_allowed_cast = 0.4;
 local function logics(target)
     
     local menu_boolean = menu_elements_maul.main_boolean:get();
@@ -56,7 +56,7 @@ local function logics(target)
         local current_resource_ws = player_local:get_primary_resource_current();
         local max_resource_ws = player_local:get_primary_resource_max();
         local spirit_perc = current_resource_ws / max_resource_ws 
-        local low_in_spirit = spirit_perc < 0.4
+        local low_in_spirit = spirit_perc < 0.2
         -- console.print("spirit % " .. spirit_perc)
     
         if not low_in_spirit then

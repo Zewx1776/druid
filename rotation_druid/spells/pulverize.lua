@@ -48,7 +48,7 @@ local function logics(target)
     if cast_spell.target(target, pulverize_data, false) then
 
         local current_time = get_time_since_inject();
-        next_time_allowed_cast = current_time + 1.3;
+        next_time_allowed_cast = current_time + 3.3;
 
         return true;
     end;
