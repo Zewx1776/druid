@@ -5,7 +5,7 @@ local petrify_menu_elements =
 {
     tree_tab           = tree_node:new(1),
     main_boolean       = checkbox:new(true, get_hash(my_utility.plugin_label .. "disable_enable_ability")),
-    min_max_targets    = slider_int:new(0, 30, 5, get_hash(my_utility.plugin_label .. "min_max_number_of_targets_for_cast"))
+    min_max_targets    = slider_int:new(0, 30, 1, get_hash(my_utility.plugin_label .. "min_max_number_of_targets_for_cast"))
 }
 
 local function menu()
