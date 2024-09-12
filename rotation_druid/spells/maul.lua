@@ -56,7 +56,7 @@ local function logics(target)
         local current_resource_ws = player_local:get_primary_resource_current();
         local max_resource_ws = player_local:get_primary_resource_max();
         local spirit_perc = current_resource_ws / max_resource_ws 
-        local low_in_spirit = spirit_perc < 0.2
+        local low_in_spirit = spirit_perc < 0.6
         -- console.print("spirit % " .. spirit_perc)
     
         if not low_in_spirit then
