@@ -4,7 +4,7 @@ local cyclone_menu_elements =
 {
     main_tab           = tree_node:new(1),
     main_boolean       = checkbox:new(true, get_hash(my_utility.plugin_label .. "disable_enable_ability")),
-    min_max_targets    = slider_int:new(0, 30, 5, get_hash(my_utility.plugin_label .. "min_max_number_of_targets_for_cast"))
+    min_max_targets    = slider_int:new(0, 30, 0, get_hash(my_utility.plugin_label .. "min_max_number_of_targets_for_cast"))
 }
 
 local function menu()
