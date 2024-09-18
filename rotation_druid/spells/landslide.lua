@@ -39,9 +39,24 @@ local function logics(target)
         return false;
     end;
 
+    local player = get_local_player()
+    if player then
+        local player_position = player:get_position()
+        if player_position then
+            if evade.is_dangerous_position(player_position) then
+                console.print("Druid Plugin, Cannot cast Land Slide - position is dangerous");
+                return false;
+            end
+        else
+            return false;
+        end
+    else
+        return false;
+    end;
+
     if cast_spell.target(target, landslide_data, false) then
         local current_time = get_time_since_inject();
-        next_time_allowed_cast = current_time + 0.05;
+        next_time_allowed_cast = current_time + 0.15;
         
         console.print("Druid Plugin, Casted Land Slide");
         return true;
